@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36408.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BCC10730-A21D-466C-ADB1-956783BF84FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurboMapper.Tests", "tests\TurboMapper.Tests\TurboMapper.Tests.csproj", "{5D40608B-1B88-43B3-A671-13E481EBB8A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurboMapper", "src\TurboMapper\TurboMapper.csproj", "{99B5CB64-EEB2-0E0F-9705-522EA043EDBB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{71A43944-15BC-478C-9A70-8770E96F6C55}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\Master-Build.yml = .github\workflows\Master-Build.yml
+		.github\workflows\Master-CodeQL.yml = .github\workflows\Master-CodeQL.yml
+		.github\workflows\PR-CI.yml = .github\workflows\PR-CI.yml
+		.github\workflows\PR-CodeQL.yml = .github\workflows\PR-CodeQL.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5D40608B-1B88-43B3-A671-13E481EBB8A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D40608B-1B88-43B3-A671-13E481EBB8A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D40608B-1B88-43B3-A671-13E481EBB8A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D40608B-1B88-43B3-A671-13E481EBB8A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99B5CB64-EEB2-0E0F-9705-522EA043EDBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99B5CB64-EEB2-0E0F-9705-522EA043EDBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99B5CB64-EEB2-0E0F-9705-522EA043EDBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99B5CB64-EEB2-0E0F-9705-522EA043EDBB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5D40608B-1B88-43B3-A671-13E481EBB8A2} = {BCC10730-A21D-466C-ADB1-956783BF84FB}
+		{99B5CB64-EEB2-0E0F-9705-522EA043EDBB} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6D76CC20-BFF5-44D1-890A-3C101EFA8A98}
+	EndGlobalSection
+EndGlobal
