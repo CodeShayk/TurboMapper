@@ -7,13 +7,25 @@ using System.Runtime.CompilerServices;
 
 namespace TurboMapper.Impl
 {
+    internal class MapperConfiguration
+    {
+        public List<PropertyMapping> Mappings { get; set; }
+        public bool EnableDefaultMapping { get; set; }
+        
+        public MapperConfiguration(List<PropertyMapping> mappings, bool enableDefaultMapping)
+        {
+            Mappings = mappings ?? new List<PropertyMapping>();
+            EnableDefaultMapping = enableDefaultMapping;
+        }
+    }
+
     internal class Mapper : IMapper, IObjectMap
     {
-        private readonly Dictionary<Type, Dictionary<Type, List<PropertyMapping>>> _configurations;
+        private readonly Dictionary<Type, Dictionary<Type, MapperConfiguration>> _configurations;
 
         public Mapper()
         {
-            _configurations = new Dictionary<Type, Dictionary<Type, List<PropertyMapping>>>();
+            _configurations = new Dictionary<Type, Dictionary<Type, MapperConfiguration>>();
         }
 
         public void CreateMap<TSource, TTarget>(List<PropertyMapping> mappings = null)
@@ -22,9 +34,20 @@ namespace TurboMapper.Impl
             var targetType = typeof(TTarget);
 
             if (!_configurations.ContainsKey(sourceType))
-                _configurations[sourceType] = new Dictionary<Type, List<PropertyMapping>>();
+                _configurations[sourceType] = new Dictionary<Type, MapperConfiguration>();
 
-            _configurations[sourceType][targetType] = mappings ?? new List<PropertyMapping>();
+            _configurations[sourceType][targetType] = new MapperConfiguration(mappings, true);
+        }
+        
+        public void CreateMap<TSource, TTarget>(List<PropertyMapping> mappings, bool enableDefaultMapping)
+        {
+            var sourceType = typeof(TSource);
+            var targetType = typeof(TTarget);
+
+            if (!_configurations.ContainsKey(sourceType))
+                _configurations[sourceType] = new Dictionary<Type, MapperConfiguration>();
+
+            _configurations[sourceType][targetType] = new MapperConfiguration(mappings, enableDefaultMapping);
         }
 
         public TTarget Map<TSource, TTarget>(TSource source)
@@ -41,8 +64,11 @@ namespace TurboMapper.Impl
             if (_configurations.ContainsKey(sourceType) &&
                 _configurations[sourceType].ContainsKey(targetType))
             {
-                var mappings = _configurations[sourceType][targetType];
-                ApplyCustomMappings(source, target, mappings);
+                var config = _configurations[sourceType][targetType];
+                if (config.EnableDefaultMapping)
+                    ApplyCustomMappings(source, target, config.Mappings);
+                else
+                    ApplyCustomMappingsWithDefaultDisabled(source, target, config.Mappings);
             }
             else
                 // Default name-based mapping
@@ -67,6 +93,19 @@ namespace TurboMapper.Impl
             ApplyDefaultNameBasedMapping(source, target, mappings);
         }
 
+        internal void ApplyCustomMappingsWithDefaultDisabled<TSource, TTarget>(
+            TSource source,
+            TTarget target,
+            List<PropertyMapping> mappings)
+        {
+            // Apply only custom mappings, no default mappings
+            foreach (var mapping in mappings)
+            {
+                var sourceValue = GetNestedValue(source, mapping.SourcePropertyPath);
+                SetNestedValue(target, mapping.TargetPropertyPath, sourceValue);
+            }
+        }
+
         private void ApplyDefaultNameBasedMapping<TSource, TTarget>(
             TSource source,
             TTarget target,
@@ -77,22 +116,48 @@ namespace TurboMapper.Impl
 
             foreach (var sourceProp in sourceProps)
             {
-                // Check if this property is already mapped in custom mappings
-                var isMapped = customMappings.Exists(m =>
-                    m.SourcePropertyPath.Split('.').Last() == sourceProp.Name);
+                // For default mapping, check if this source property maps to any target property in custom mappings
+                // by checking if there's a custom mapping that targets a property with the same name as sourceProp.Name
+                var targetProp = targetProps.FirstOrDefault(p =>
+                    p.Name == sourceProp.Name &&
+                    p.CanWrite);
 
-                if (!isMapped)
+                if (targetProp != null)
                 {
-                    var targetProp = targetProps.FirstOrDefault(p =>
-                        p.Name == sourceProp.Name &&
-                        p.CanWrite &&
-                        p.PropertyType.IsAssignableFrom(sourceProp.PropertyType));
+                    // Check if this target property is already targeted by any custom mapping
+                    var isTargeted = customMappings.Exists(m =>
+                        m.TargetPropertyPath.Split('.').Last() == targetProp.Name);
 
-                    if (targetProp != null)
+                    if (!isTargeted)
                     {
                         var sourceValue = sourceProp.GetValue(source);
-                        var convertedValue = ConvertValue(sourceValue, targetProp.PropertyType);
-                        targetProp.SetValue(target, convertedValue);
+
+                        if (IsComplexType(sourceProp.PropertyType) && IsComplexType(targetProp.PropertyType))
+                        {
+                            // Handle nested object mapping
+                            if (sourceValue != null)
+                            {
+                                var nestedTargetValue = targetProp.GetValue(target);
+                                if (nestedTargetValue == null)
+                                {
+                                    nestedTargetValue = Activator.CreateInstance(targetProp.PropertyType);
+                                    targetProp.SetValue(target, nestedTargetValue);
+                                }
+
+                                var nestedSourceValue = sourceValue;
+                                ApplyNameBasedMapping(nestedSourceValue, nestedTargetValue);
+                            }
+                            else
+                            {
+                                targetProp.SetValue(target, null);
+                            }
+                        }
+                        else
+                        {
+                            // Handle simple types or type conversion
+                            var convertedValue = ConvertValue(sourceValue, targetProp.PropertyType);
+                            targetProp.SetValue(target, convertedValue);
+                        }
                     }
                 }
             }
@@ -113,6 +178,7 @@ namespace TurboMapper.Impl
                     var sourceValue = sourceProp.GetValue(source);
 
                     if (IsComplexType(sourceProp.PropertyType) && IsComplexType(targetProp.PropertyType))
+                    {
                         // Handle nested object mapping
                         if (sourceValue != null)
                         {
@@ -123,14 +189,20 @@ namespace TurboMapper.Impl
                                 targetProp.SetValue(target, nestedTargetValue);
                             }
 
-                            var nestedSourceValue = sourceValue;
-                            ApplyNameBasedMapping(nestedSourceValue, nestedTargetValue);
+                            // Recursively map the nested object properties
+                            ApplyNameBasedMapping(sourceValue, nestedTargetValue);
                         }
                         else
                         {
-                            var convertedValue = ConvertValue(sourceValue, targetProp.PropertyType);
-                            targetProp.SetValue(target, convertedValue);
+                            targetProp.SetValue(target, null);
                         }
+                    }
+                    else
+                    {
+                        // Handle simple types or type conversion
+                        var convertedValue = ConvertValue(sourceValue, targetProp.PropertyType);
+                        targetProp.SetValue(target, convertedValue);
+                    }
                 }
             }
         }
@@ -192,7 +264,7 @@ namespace TurboMapper.Impl
                 return false;
             if (type.IsArray)
                 return false;
-            if (type.GetInterface("IEnumerable") != null)
+            if (typeof(System.Collections.IEnumerable).IsAssignableFrom(type) && type != typeof(string))
                 return false;
             return true;
         }
@@ -205,27 +277,78 @@ namespace TurboMapper.Impl
                 return value;
 
             if (targetType.IsEnum)
-                return Enum.Parse(targetType, value.ToString());
+                return Enum.Parse(targetType, value.ToString(), ignoreCase: true);
 
             if (targetType == typeof(string))
                 return value.ToString();
 
+            if (targetType == typeof(Guid))
+                return Guid.Parse(value.ToString());
+
             if (targetType.IsValueType)
-                return Convert.ChangeType(value, targetType);
+            {
+                try
+                {
+                    if (targetType == typeof(int) && value is double doubleValue)
+                        return (int)doubleValue; // Explicit truncation for double to int
+                    else if (targetType == typeof(int) && value is float floatValue)
+                        return (int)floatValue; // Explicit truncation for float to int
+                    else
+                        return Convert.ChangeType(value, targetType);
+                }
+                catch (FormatException)
+                {
+                    // If conversion fails, return default value for the target type
+                    return Activator.CreateInstance(targetType);
+                }
+                catch (InvalidCastException)
+                {
+                    // If conversion fails, return default value for the target type
+                    return Activator.CreateInstance(targetType);
+                }
+            }
 
-            // Handle complex types recursively
-            if (IsComplexType(targetType) && value != null)
-                return Map(value, targetType);
-
+            // Handle complex types recursively - this is for when we need to convert
+            // an object of one type to another (e.g., assigning Address object to AddressWithConfig property)
+            if (IsComplexType(targetType) && value != null && !targetType.IsAssignableFrom(value.GetType()))
+            {
+                try 
+                {
+                    // Use the main Map method to convert the object from one type to another
+                    var sourceType = value.GetType();
+                    var genericMapMethod = typeof(Mapper).GetMethod(nameof(Map), 
+                        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                        
+                    if (genericMapMethod != null)
+                    {
+                        var specificMapMethod = genericMapMethod.MakeGenericMethod(sourceType, targetType);
+                        return specificMapMethod.Invoke(this, new object[] { value });
+                    }
+                }
+                catch
+                {
+                    // If mapping fails, return the original value
+                    return value;
+                }
+            }
+            
             return value;
         }
 
         private object Map(object source, Type targetType)
         {
             var sourceType = source.GetType();
-            var mapMethod = typeof(Mapper).GetMethod(nameof(Map), new[] { sourceType, targetType });
-            var genericMapMethod = mapMethod.MakeGenericMethod(sourceType, targetType);
-            return genericMapMethod.Invoke(this, new object[] { source });
+            // Get the generic Map method (TTarget Map<TSource, TTarget>(TSource source))
+            var genericMapMethod = typeof(Mapper).GetMethod(nameof(Map), 
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                
+            if (genericMapMethod == null)
+            {
+                throw new InvalidOperationException($"Could not find Map method for source type {sourceType}");
+            }
+            
+            var specificMapMethod = genericMapMethod.MakeGenericMethod(sourceType, targetType);
+            return specificMapMethod.Invoke(this, new object[] { source });
         }
     }
 }

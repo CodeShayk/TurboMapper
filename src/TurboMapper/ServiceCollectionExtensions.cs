@@ -11,6 +11,9 @@ namespace TurboMapper
         public static IServiceCollection AddTurboMapper(
             this IServiceCollection services)
         {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+                
             // Register ObjectMapper as singleton
             services.AddSingleton<IMapper, Mapper>(serviceProvider =>
             {

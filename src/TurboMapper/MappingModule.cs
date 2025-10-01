@@ -35,8 +35,7 @@ namespace TurboMapper
                     {
                         var targetProp = targetProps.FirstOrDefault(p =>
                             p.Name == sourceProp.Name &&
-                            p.CanWrite &&
-                            p.PropertyType.IsAssignableFrom(sourceProp.PropertyType));
+                            p.CanWrite);
 
                         if (targetProp != null)
                             // Add default mapping for unmapped properties
@@ -51,7 +50,7 @@ namespace TurboMapper
                 }
             }
 
-            mapper.CreateMap<TSource, TTarget>(expression.Mappings);
+            mapper.CreateMap<TSource, TTarget>(expression.Mappings, _enableDefaultMapping);
         }
 
         public abstract Action<IMappingExpression<TSource, TTarget>> CreateMappings();
