@@ -6,7 +6,9 @@
     <Title>TurboMapper</Title>
     <Authors>CodeShayk</Authors>
     <Company>CodeShayk</Company>
-    <Description>Object mapper library in .Net with sallow and deep mapping support. Free alternative to Automapper</Description>
+    <Description>
+      `TurboMapper` is a lightweight, high-performance object mapper for .NET that provides both shallow and deep mapping capabilities. It serves as a free alternative to AutoMapper with a simple, intuitive API.
+    </Description>
     <PackageIcon>ninja-icon-16.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
