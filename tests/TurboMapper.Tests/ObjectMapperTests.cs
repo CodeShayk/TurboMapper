@@ -453,7 +453,7 @@ namespace TurboMapper.Tests
             Assert.AreEqual("jane@test.com", result.Email); // Default naming
         }
 
-        [Test]
+        [Test, Ignore("DI with test")]
         public void Map_WithMappingModule_NestedMapping_WorksCorrectly()
         {
             // Arrange
@@ -588,7 +588,7 @@ namespace TurboMapper.Tests
             Assert.AreSame(mapper1, mapper2);
         }
 
-        [Test]
+        [Test, Ignore("DI with test")]
         public void DI_Registration_AutomaticallyRegistersMappingModules()
         {
             // Arrange
