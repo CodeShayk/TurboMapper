@@ -5,6 +5,7 @@ namespace TurboMapper
     internal interface IObjectMap
     {
         void CreateMap<TSource, TTarget>(List<PropertyMapping> mappings = null);
+
         void CreateMap<TSource, TTarget>(List<PropertyMapping> mappings, bool enableDefaultMapping);
     }
 }

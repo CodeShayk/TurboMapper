@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +14,7 @@ namespace TurboMapper
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
-                
+
             // Register ObjectMapper as singleton
             services.AddSingleton<IMapper, Mapper>(serviceProvider =>
             {
@@ -34,7 +33,7 @@ namespace TurboMapper
         {
             // Strategy 1: Get all currently loaded assemblies
             var loadedAssemblies = new HashSet<Assembly>();
-            
+
             try
             {
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -63,7 +62,7 @@ namespace TurboMapper
             {
                 // Continue if entry assembly can't be accessed
             }
-            
+
             try
             {
                 var callingAssembly = Assembly.GetCallingAssembly();
@@ -76,7 +75,7 @@ namespace TurboMapper
             {
                 // Continue if calling assembly can't be accessed
             }
-                
+
             try
             {
                 var executingAssembly = Assembly.GetExecutingAssembly();
@@ -120,16 +119,16 @@ namespace TurboMapper
                 }
             }
         }
-        
+
         private static List<Type> GetMappingTypesFromAssembly(Assembly assembly)
         {
             try
             {
-                if (assembly.IsDynamic || assembly.GlobalAssemblyCache) 
+                if (assembly.IsDynamic || assembly.GlobalAssemblyCache)
                 {
                     return new List<Type>();
                 }
-                
+
                 return assembly.GetTypes()
                     .Where(t => t.IsClass && !t.IsAbstract && typeof(IMappingModule).IsAssignableFrom(t))
                     .ToList();

@@ -11,7 +11,7 @@ namespace TurboMapper.Impl
     {
         public List<PropertyMapping> Mappings { get; set; }
         public bool EnableDefaultMapping { get; set; }
-        
+
         public MapperConfiguration(List<PropertyMapping> mappings, bool enableDefaultMapping)
         {
             Mappings = mappings ?? new List<PropertyMapping>();
@@ -38,7 +38,7 @@ namespace TurboMapper.Impl
 
             _configurations[sourceType][targetType] = new MapperConfiguration(mappings, true);
         }
-        
+
         public void CreateMap<TSource, TTarget>(List<PropertyMapping> mappings, bool enableDefaultMapping)
         {
             var sourceType = typeof(TSource);
@@ -146,7 +146,7 @@ namespace TurboMapper.Impl
 
                                 var nestedSourceValue = sourceValue;
                                 // Use reflection to call the right generic method for nested mapping
-                                var genericMethod = typeof(Mapper).GetMethod(nameof(ApplyNameBasedMapping), 
+                                var genericMethod = typeof(Mapper).GetMethod(nameof(ApplyNameBasedMapping),
                                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                                 var specificMethod = genericMethod.MakeGenericMethod(sourceProp.PropertyType, targetProp.PropertyType);
                                 specificMethod.Invoke(this, new object[] { nestedSourceValue, nestedTargetValue });
@@ -194,7 +194,7 @@ namespace TurboMapper.Impl
                             }
 
                             // Recursively map the nested object properties using reflection
-                            var genericMethod = typeof(Mapper).GetMethod(nameof(ApplyNameBasedMapping), 
+                            var genericMethod = typeof(Mapper).GetMethod(nameof(ApplyNameBasedMapping),
                                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                             var specificMethod = genericMethod.MakeGenericMethod(sourceProp.PropertyType, targetProp.PropertyType);
                             specificMethod.Invoke(this, new object[] { sourceValue, nestedTargetValue });
@@ -319,13 +319,13 @@ namespace TurboMapper.Impl
             // an object of one type to another (e.g., assigning Address object to AddressWithConfig property)
             if (IsComplexType(targetType) && value != null && !targetType.IsAssignableFrom(value.GetType()))
             {
-                try 
+                try
                 {
                     // Use the main Map method to convert the object from one type to another
                     var sourceType = value.GetType();
-                    var genericMapMethod = typeof(Mapper).GetMethod(nameof(Map), 
+                    var genericMapMethod = typeof(Mapper).GetMethod(nameof(Map),
                         System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-                        
+
                     if (genericMapMethod != null)
                     {
                         var specificMapMethod = genericMapMethod.MakeGenericMethod(sourceType, targetType);
@@ -338,7 +338,7 @@ namespace TurboMapper.Impl
                     return value;
                 }
             }
-            
+
             return value;
         }
 
@@ -346,14 +346,14 @@ namespace TurboMapper.Impl
         {
             var sourceType = source.GetType();
             // Get the generic Map method (TTarget Map<TSource, TTarget>(TSource source))
-            var genericMapMethod = typeof(Mapper).GetMethod(nameof(Map), 
+            var genericMapMethod = typeof(Mapper).GetMethod(nameof(Map),
                 System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-                
+
             if (genericMapMethod == null)
             {
                 throw new InvalidOperationException($"Could not find Map method for source type {sourceType}");
             }
-            
+
             var specificMapMethod = genericMapMethod.MakeGenericMethod(sourceType, targetType);
             return specificMapMethod.Invoke(this, new object[] { source });
         }
