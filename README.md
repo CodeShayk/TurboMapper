@@ -22,9 +22,12 @@ This comprehensive guide provides detailed information on TurboMapper, covering 
 
 Please click on [Developer Guide](https://github.com/CodeShayk/TurboMapper/wiki) for complete details.
 
-
-## Support
-If you are having problems, please let me know by [raising a new issue](https://github.com/CodeShayk/TurboMapper/issues/new/choose).
+## Contributing
+We welcome contributions! Please see our Contributing Guide for details.
+- 🐛 Bug Reports - If you are having problems, please let me know by raising a [new issue](https://github.com/CodeShayk/TurboMapper/issues/new/choose).
+- 💡 Feature Requests - Start a [discussion](https://github.com/CodeShayk/TurboMapper/discussions)
+- 📝 Documentation - Help improve our [docs](https://github.com/CodeShayk/TurboMapper/wiki)
+- 💻 Code - Submit [pull](https://github.com/CodeShayk/TurboMapper/pulls) requests
 
 ## License
 
