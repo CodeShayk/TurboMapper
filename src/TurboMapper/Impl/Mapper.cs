@@ -145,7 +145,11 @@ namespace TurboMapper.Impl
                                 }
 
                                 var nestedSourceValue = sourceValue;
-                                ApplyNameBasedMapping(nestedSourceValue, nestedTargetValue);
+                                // Use reflection to call the right generic method for nested mapping
+                                var genericMethod = typeof(Mapper).GetMethod(nameof(ApplyNameBasedMapping), 
+                                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                                var specificMethod = genericMethod.MakeGenericMethod(sourceProp.PropertyType, targetProp.PropertyType);
+                                specificMethod.Invoke(this, new object[] { nestedSourceValue, nestedTargetValue });
                             }
                             else
                             {
@@ -189,8 +193,11 @@ namespace TurboMapper.Impl
                                 targetProp.SetValue(target, nestedTargetValue);
                             }
 
-                            // Recursively map the nested object properties
-                            ApplyNameBasedMapping(sourceValue, nestedTargetValue);
+                            // Recursively map the nested object properties using reflection
+                            var genericMethod = typeof(Mapper).GetMethod(nameof(ApplyNameBasedMapping), 
+                                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                            var specificMethod = genericMethod.MakeGenericMethod(sourceProp.PropertyType, targetProp.PropertyType);
+                            specificMethod.Invoke(this, new object[] { sourceValue, nestedTargetValue });
                         }
                         else
                         {
