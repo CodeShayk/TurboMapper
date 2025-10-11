@@ -14,7 +14,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Copyright>Copyright (c) 2025 Code Shayk</Copyright>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>object-mapper, deep-mapper, shallow-mapper, mapping-library,automapper, turbomapper, objectmapper, mapper, mappinglibrary</PackageTags>
+    <PackageTags>object-mapper, deep-mapper, mapping-library, automapper, turbomapper, objectmapper, mapper, mappings, mapper-library</PackageTags>
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>

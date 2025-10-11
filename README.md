@@ -56,9 +56,6 @@ var sources = new List<Source>
 
 // Map to IEnumerable<T>
 IEnumerable<Target> targets = mapper.Map<Source, Target>(sources);
-
-// Convert to list if needed
-List<Target> targetList = targets.ToList();
 ```
 
 ### iii. Developer Guide
@@ -76,18 +73,6 @@ This section provides the summary of planned releases with key details about eac
 | 2.1.0 | Mid 2026 | Pre-compiled mappings, reverse mapping, async transformations, async collection processing, LINQ expressions, projection support, detailed tracing | ❌ Contains breaking changes (new async methods in IMapper) | Next-gen features, async operations, data access integration |
 
 Please see [Release Roadmap](https://github.com/CodeShayk/TurboMapper/blob/master/Release_Roadmap.md) for more details.
-
-## Key Features in Release 1.2.0
-- **Performance Improvements**: Significant performance enhancements (2x+) through compiled expression trees and metadata caching
-- **Enhanced Collection Mapping**: Simplified API with Map method now supporting both single objects and collections
-- **Ignored Properties Option**: Added Ignore method to IMappingExpression to skip properties during mapping
-- **Custom Type Converters Registration**: Added RegisterConverter method to MappingModule for custom type conversion functions that can be registered with type mappings
-- **Improved Nullable Type Handling**: Enhanced ConvertValue method to handle nullable types properly
-- **Conditional Mapping**: Added When method to IMappingExpression for conditional property mapping
-- **Mapping Transformations**: Added MapWith method for transformation functions during mapping
-- **Comprehensive Type Conversions**: Enhanced ConvertValue with DateTime, TimeSpan, and other common type conversions
-- **Configuration Validation**: Added ValidateMapping method to IMapper that returns ValidationResult for early validation
-- **Improved Error Messages**: Better debugging information for conversion failures
 
 ## Contributing
 We welcome contributions! Please see our Contributing Guide for details.
