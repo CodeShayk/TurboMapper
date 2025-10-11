@@ -21,8 +21,8 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PackageProjectUrl>https://github.com/CodeShayk/TurboMapper/wiki</PackageProjectUrl>
     <RepositoryUrl>https://github.com/CodeShayk/TurboMapper</RepositoryUrl>
-    <PackageReleaseNotes>v1.0.0 - Release of object mapper</PackageReleaseNotes>
-    <Version>1.0.0</Version>
+    <PackageReleaseNotes>v1.2.0 - Enhanced core and mapping features including performance improvements (2x+ speed), collection mapping support, custom type converters, conditional mapping, transformation functions, and configuration validation</PackageReleaseNotes>
+    <Version>1.2.0</Version>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <AssemblyName>TurboMapper</AssemblyName>
   </PropertyGroup>
