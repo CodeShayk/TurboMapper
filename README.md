@@ -23,7 +23,16 @@ This comprehensive guide provides detailed information on TurboMapper, covering 
 Please click on [Developer Guide](https://github.com/CodeShayk/TurboMapper/wiki) for complete details.
 
 ## Release Roadmap
-Please see [Release Roadmap](https://github.com/CodeShayk/TurboMapper/blob/master/Release_Roadmap.md) for summary of planned releases with key details about each release.
+This section provides the summary of planned  releases with key details about each release.
+
+| Release Version | Release Date | Key Features | Backward Compatibility | Primary Focus |
+|----------------|--------------|--------------|----------------------|---------------|
+| 1.2.0 | October 2025 | Performance improvements (2x+ speed), collection mapping, custom type converters, conditional mapping, transformation functions, configuration validation, improved error messages | ✅ Fully backward compatible | Core improvements, mapping features, custom conversions |
+| 1.4.0 | Jan 2026 | Complex nested mapping, circular reference handling, performance diagnostics, generic collection interfaces, interface-to-concrete mapping, dictionary mapping, .NET Standard compatibility | ✅ Fully backward compatible | Advanced mapping, type features, enhanced conversions |
+| 2.1.0 | Mid 2026 | Pre-compiled mappings, reverse mapping, async transformations, async collection processing, LINQ expressions, projection support, detailed tracing | ❌ Contains breaking changes (new async methods in IMapper) | Next-gen features, async operations, data access integration |
+
+Please see [Release Roadmap](https://github.com/CodeShayk/TurboMapper/blob/master/Release_Roadmap.md) for more details.
+
 ## Contributing
 We welcome contributions! Please see our Contributing Guide for details.
 - 🐛 Bug Reports - If you are having problems, please let me know by raising a [new issue](https://github.com/CodeShayk/TurboMapper/issues/new/choose).
