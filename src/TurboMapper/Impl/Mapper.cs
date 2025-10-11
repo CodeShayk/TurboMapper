@@ -201,13 +201,7 @@ namespace TurboMapper.Impl
         // Custom converter system
         private readonly Dictionary<string, Delegate> _converters = new Dictionary<string, Delegate>();
 
-        public bool ValidateMapping<TSource, TTarget>()
-        {
-            var errors = GetMappingErrors<TSource, TTarget>();
-            return errors.Length == 0;
-        }
-
-        public string[] GetMappingErrors<TSource, TTarget>()
+        public ValidationResult ValidateMapping<TSource, TTarget>()
         {
             var errors = new List<string>();
             var sourceType = typeof(TSource);
@@ -241,7 +235,8 @@ namespace TurboMapper.Impl
                 }
             }
 
-            return errors.ToArray();
+            var isValid = errors.Count == 0;
+            return new ValidationResult(isValid, errors);
         }
 
         private bool PropertyExists(Type type, string propertyPath)

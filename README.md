@@ -86,7 +86,7 @@ Please see [Release Roadmap](https://github.com/CodeShayk/TurboMapper/blob/maste
 - **Conditional Mapping**: Added When method to IMappingExpression for conditional property mapping
 - **Mapping Transformations**: Added MapWith method for transformation functions during mapping
 - **Comprehensive Type Conversions**: Enhanced ConvertValue with DateTime, TimeSpan, and other common type conversions
-- **Configuration Validation**: Added ValidateMapping and GetMappingErrors methods to IMapper for early validation
+- **Configuration Validation**: Added ValidateMapping method to IMapper that returns ValidationResult for early validation
 - **Improved Error Messages**: Better debugging information for conversion failures
 
 ## Contributing

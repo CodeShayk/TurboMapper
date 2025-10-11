@@ -291,11 +291,10 @@ namespace TurboMapper.Tests
             mapper.CreateMap<Person, PersonDto>(new List<PropertyMapping>());
 
             // Validate the mapping
-            var isValid = mapper.ValidateMapping<Person, PersonDto>();
-            var errors = mapper.GetMappingErrors<Person, PersonDto>();
+            var validationResult = mapper.ValidateMapping<Person, PersonDto>();
 
-            Assert.IsTrue(isValid, string.Join(", ", errors));
-            Assert.AreEqual(0, errors.Length);
+            Assert.IsTrue(validationResult.IsValid, string.Join(", ", validationResult.Errors));
+            Assert.AreEqual(0, validationResult.Errors.Count());
         }
 
         // Test models
