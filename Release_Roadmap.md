@@ -6,8 +6,8 @@ This document provides a summary of TurboMapper releases with key details about 
 | Release Version | Release Date | Key Features | Backward Compatibility | Primary Focus |
 |----------------|--------------|--------------|----------------------|---------------|
 | 1.2.0 | October 2025 | Performance improvements (2x+ speed), collection mapping, custom type converters, conditional mapping, transformation functions, configuration validation, improved error messages | ✅ Fully backward compatible | Core improvements, mapping features, custom conversions |
-| 1.4.0 | TBA | Complex nested mapping, circular reference handling, performance diagnostics, generic collection interfaces, interface-to-concrete mapping, dictionary mapping, .NET Standard compatibility | ✅ Fully backward compatible | Advanced mapping, type features, enhanced conversions |
-| 2.1.0 | TBA | Pre-compiled mappings, reverse mapping, async transformations, async collection processing, LINQ expressions, projection support, detailed tracing | ❌ Contains breaking changes (new async methods in IMapper) | Next-gen features, async operations, data access integration |
+| 1.4.0 | January 2025 | Complex nested mapping, circular reference handling, performance diagnostics, generic collection interfaces, interface-to-concrete mapping, dictionary mapping, .NET Standard compatibility | ✅ Fully backward compatible | Advanced mapping, type features, enhanced conversions |
+| 2.1.0 | Mid 2026 | Pre-compiled mappings, reverse mapping, async transformations, async collection processing, LINQ expressions, projection support, detailed tracing | ❌ Contains breaking changes (new async methods in IMapper) | Next-gen features, async operations, data access integration |
 
 ## Detailed Release Notes
 
