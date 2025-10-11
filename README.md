@@ -81,7 +81,7 @@ Please see [Release Roadmap](https://github.com/CodeShayk/TurboMapper/blob/maste
 - **Performance Improvements**: Significant performance enhancements (2x+) through compiled expression trees and metadata caching
 - **Enhanced Collection Mapping**: Simplified API with Map method now supporting both single objects and collections
 - **Ignored Properties Option**: Added Ignore method to IMappingExpression to skip properties during mapping
-- **Custom Type Converters Registration**: Added RegisterConverter method to IMapper for custom type conversion functions
+- **Custom Type Converters Registration**: Added RegisterConverter method to MappingModule for custom type conversion functions that can be registered with type mappings
 - **Improved Nullable Type Handling**: Enhanced ConvertValue method to handle nullable types properly
 - **Conditional Mapping**: Added When method to IMappingExpression for conditional property mapping
 - **Mapping Transformations**: Added MapWith method for transformation functions during mapping

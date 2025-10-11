@@ -157,6 +157,12 @@ namespace TurboMapper.Impl
             }
         }
 
+        public void RegisterConverter<TSource, TDestination>(Func<TSource, TDestination> converter)
+        {
+            var key = $"{typeof(TSource).FullName}_{typeof(TDestination).FullName}";
+            _converters[key] = converter;
+        }
+
         private void ApplyDefaultNameBasedMapping<TSource, TTarget>(
             TSource source,
             TTarget target,
@@ -194,12 +200,6 @@ namespace TurboMapper.Impl
 
         // Custom converter system
         private readonly Dictionary<string, Delegate> _converters = new Dictionary<string, Delegate>();
-
-        public void RegisterConverter<TSource, TDestination>(Func<TSource, TDestination> converter)
-        {
-            var key = $"{typeof(TSource).FullName}_{typeof(TDestination).FullName}";
-            _converters[key] = converter;
-        }
 
         public bool ValidateMapping<TSource, TTarget>()
         {
