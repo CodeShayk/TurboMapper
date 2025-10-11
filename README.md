@@ -1,4 +1,4 @@
-# <img src="https://github.com/CodeShayk/TurboMapper/blob/master/Images/ninja-icon-16.png" alt="ninja" style="width:30px;"/> TurboMapper v1.0.0
+# <img src="https://github.com/CodeShayk/TurboMapper/blob/master/Images/ninja-icon-16.png" alt="ninja" style="width:30px;"/> TurboMapper v1.2.0
 [![NuGet version](https://badge.fury.io/nu/TurboMapper.svg)](https://badge.fury.io/nu/TurboMapper) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/CodeShayk/TurboMapper/blob/master/LICENSE.md) 
 [![GitHub Release](https://img.shields.io/github/v/release/CodeShayk/TurboMapper?logo=github&sort=semver)](https://github.com/CodeShayk/TurboMapper/releases/latest)
 [![master-build](https://github.com/CodeShayk/TurboMapper/actions/workflows/Master-Build.yml/badge.svg)](https://github.com/CodeShayk/TurboMapper/actions/workflows/Master-Build.yml)
@@ -10,24 +10,65 @@
 ## Introduction
 ### What is TurboMapper?
 `TurboMapper` is a lightweight, high-performance object mapper for .NET that provides both shallow and deep mapping capabilities. It serves as a free alternative to AutoMapper with a simple, intuitive API.
-## Getting Started?
+
+## Getting Started
 ### i. Installation
 Install the latest version of TurboMapper nuget package with command below. 
 
 ```
 NuGet\Install-Package TurboMapper 
 ```
-### ii. Developer Guide
+
+### ii. Quick Start Example
+```csharp
+using TurboMapper;
+using Microsoft.Extensions.DependencyInjection;
+
+// Setup
+var services = new ServiceCollection();
+services.AddTurboMapper();
+var serviceProvider = services.BuildServiceProvider();
+var mapper = serviceProvider.GetService<IMapper>();
+
+// Define models
+public class Source
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+}
+
+public class Target
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+}
+
+// Map single object
+var source = new Source { Name = "John Doe", Age = 30 };
+var target = mapper.Map<Source, Target>(source);
+
+// Map collections
+var sources = new List<Source>
+{
+    new Source { Name = "Alice", Age = 25 },
+    new Source { Name = "Bob", Age = 32 }
+};
+
+// Map to IEnumerable<T>
+IEnumerable<Target> targets = mapper.Map<Source, Target>(sources);
+```
+
+### iii. Developer Guide
 This comprehensive guide provides detailed information on TurboMapper, covering everything from basic concepts to advanced implementations and troubleshooting guidelines.
 
 Please click on [Developer Guide](https://github.com/CodeShayk/TurboMapper/wiki) for complete details.
 
 ## Release Roadmap
-This section provides the summary of planned  releases with key details about each release.
+This section provides the summary of planned releases with key details about each release.
 
 | Release Version | Release Date | Key Features | Backward Compatibility | Primary Focus |
 |----------------|--------------|--------------|----------------------|---------------|
-| 1.2.0 | October 2025 | Performance improvements (2x+ speed), collection mapping, custom type converters, conditional mapping, transformation functions, configuration validation, improved error messages | ✅ Fully backward compatible | Core improvements, mapping features, custom conversions |
+| 1.2.0 | October 2025 | Performance improvements (2x+ speed), enhanced collection mapping API, custom type converters, conditional mapping, transformation functions, configuration validation, improved error messages | ✅ Fully backward compatible | Core improvements, mapping features, custom conversions |
 | 1.4.0 | Jan 2026 | Complex nested mapping, circular reference handling, performance diagnostics, generic collection interfaces, interface-to-concrete mapping, dictionary mapping, .NET Standard compatibility | ✅ Fully backward compatible | Advanced mapping, type features, enhanced conversions |
 | 2.1.0 | Mid 2026 | Pre-compiled mappings, reverse mapping, async transformations, async collection processing, LINQ expressions, projection support, detailed tracing | ❌ Contains breaking changes (new async methods in IMapper) | Next-gen features, async operations, data access integration |
 

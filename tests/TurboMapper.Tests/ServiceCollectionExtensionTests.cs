@@ -1,8 +1,4 @@
-using System;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using TurboMapper;
-using TurboMapper.Tests;
 
 namespace TurboMapper.Tests
 {

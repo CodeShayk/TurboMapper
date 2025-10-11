@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace TurboMapper
@@ -7,5 +8,7 @@ namespace TurboMapper
         void CreateMap<TSource, TTarget>(List<PropertyMapping> mappings = null);
 
         void CreateMap<TSource, TTarget>(List<PropertyMapping> mappings, bool enableDefaultMapping);
+
+        void RegisterConverter<TSource, TDestination>(Func<TSource, TDestination> converter);
     }
 }
