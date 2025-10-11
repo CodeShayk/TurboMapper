@@ -22,6 +22,8 @@ This comprehensive guide provides detailed information on TurboMapper, covering 
 
 Please click on [Developer Guide](https://github.com/CodeShayk/TurboMapper/wiki) for complete details.
 
+## Release Roadmap
+Please see [Release Roadmap](https://github.com/CodeShayk/TurboMapper/blob/master/Release_Roadmap.md) for summary of planned releases with key details about each release.
 ## Contributing
 We welcome contributions! Please see our Contributing Guide for details.
 - 🐛 Bug Reports - If you are having problems, please let me know by raising a [new issue](https://github.com/CodeShayk/TurboMapper/issues/new/choose).
@@ -30,7 +32,6 @@ We welcome contributions! Please see our Contributing Guide for details.
 - 💻 Code - Submit [pull](https://github.com/CodeShayk/TurboMapper/pulls) requests
 
 ## License
-
 This project is licensed with the [MIT license](LICENSE).
 
 ## Credits
