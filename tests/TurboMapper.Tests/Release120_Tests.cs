@@ -144,17 +144,17 @@ namespace TurboMapper.Tests
             // Create a mapping from string to int using converter registered in module
             var converterModule = new StringToIntConverterModule();
             var mapper = new Mapper();
-            
+
             // Register the module which will register the string to int converter
             ((IMappingModule)converterModule).CreateMap(mapper);
-            
+
             // Test that a string value can be converted to int through the registered converter
             var source = new StringValueClass { Number = "42" };
             var result = mapper.Map<StringValueClass, IntValueClass>(source);
-            
+
             Assert.AreEqual(42, result.Number);
         }
-        
+
         // Test module for converter registration
         public class StringToIntConverterModule : MappingModule<StringValueClass, IntValueClass>
         {
@@ -163,18 +163,18 @@ namespace TurboMapper.Tests
                 // Register converter within the module
                 RegisterConverter<string, int>(s => int.Parse(s));
             }
-            
+
             public override Action<IMappingExpression<StringValueClass, IntValueClass>> CreateMappings()
             {
                 return expression => { };
             }
         }
-        
+
         public class StringValueClass
         {
             public string Number { get; set; }
         }
-        
+
         public class IntValueClass
         {
             public int Number { get; set; }

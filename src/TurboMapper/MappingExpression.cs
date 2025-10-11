@@ -71,7 +71,7 @@ namespace TurboMapper
 
             return this;
         }
-        
+
         public IMappingExpression<TSource, TTarget> When<TValue>(Expression<Func<TTarget, TValue>> targetMember, Func<TSource, bool> condition)
         {
             var targetPath = GetMemberPathForTarget(targetMember);
@@ -87,7 +87,7 @@ namespace TurboMapper
 
             return this;
         }
-        
+
         public IMappingExpression<TSource, TTarget> MapWith<TSourceValue, TTargetValue>(Expression<Func<TTarget, TTargetValue>> targetMember, Func<TSourceValue, TTargetValue> transformFunction)
         {
             var targetPath = GetMemberPathForTarget(targetMember);
@@ -96,7 +96,7 @@ namespace TurboMapper
             // For MapWith, we'll create a property mapping where the source property has the same name
             // as the target property, but we'll apply the transformation function
             var sourcePath = targetPath; // Assuming same property name for simplicity
-            
+
             // Add a transformation property mapping
             Mappings.Add(new PropertyMapping
             {

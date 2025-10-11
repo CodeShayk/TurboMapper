@@ -6,12 +6,12 @@ namespace TurboMapper
     {
         public bool IsValid { get; set; }
         public IEnumerable<string> Errors { get; set; }
-        
+
         public ValidationResult()
         {
             Errors = new List<string>();
         }
-        
+
         public ValidationResult(bool isValid, IEnumerable<string> errors)
         {
             IsValid = isValid;

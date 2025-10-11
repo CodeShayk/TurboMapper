@@ -82,14 +82,14 @@ namespace TurboMapper
                 {
                     var sourceType = converter.Method.GetParameters()[0].ParameterType;
                     var destType = converter.Method.ReturnType;
-                    
+
                     // Find and invoke the RegisterConverter method with proper type parameters
-                    var method = mapper.GetType().GetMethod("RegisterConverter", 
+                    var method = mapper.GetType().GetMethod("RegisterConverter",
                         System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-                        null, 
-                        new Type[] { converter.GetType() }, 
+                        null,
+                        new Type[] { converter.GetType() },
                         null);
-                    
+
                     if (method == null)
                     {
                         // Try to get the generic method and make it specific
