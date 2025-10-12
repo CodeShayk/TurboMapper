@@ -7,8 +7,17 @@ using TurboMapper.Impl;
 
 namespace TurboMapper
 {
+    /// <summary>
+    /// Extension methods for integrating TurboMapper with Microsoft.Extensions.DependencyInjection.
+    /// </summary>
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// Adds TurboMapper services.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public static IServiceCollection AddTurboMapper(
             this IServiceCollection services)
         {
@@ -28,7 +37,10 @@ namespace TurboMapper
 
             return services;
         }
-
+        /// <summary>
+        /// Discovers and registers mapping modules from loaded assemblies.
+        /// </summary>
+        /// <param name="mapper"></param>
         private static void DiscoverAndRegisterMappingModules(Mapper mapper)
         {
             // Strategy 1: Get all currently loaded assemblies
@@ -119,7 +131,11 @@ namespace TurboMapper
                 }
             }
         }
-
+        /// <summary>
+        /// Gets all non-abstract classes implementing IMappingModule from the specified assembly.
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <returns></returns>
         private static List<Type> GetMappingTypesFromAssembly(Assembly assembly)
         {
             try
