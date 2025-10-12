@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace TurboMapper
@@ -31,6 +32,7 @@ namespace TurboMapper
         {
             _configAction = CreateMappings();
             _enableDefaultMapping = enableDefaultMapping;
+            _converters = new Dictionary<string, Delegate>();
         }
         /// <summary>
         /// Creates the mapping configuration between TSource and TTarget types.

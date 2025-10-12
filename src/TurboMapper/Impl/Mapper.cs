@@ -37,7 +37,7 @@ namespace TurboMapper.Impl
     internal class Mapper : IMapper, IObjectMap
     {
         /// <summary>
-        /// Holds mapping configurations between source and target types.
+        /// Holds mapping configurations indexed by source type and target type.
         /// </summary>
         private readonly Dictionary<Type, Dictionary<Type, MapperConfiguration>> _configurations;
         /// <summary>
@@ -49,7 +49,7 @@ namespace TurboMapper.Impl
         /// </summary>
         private readonly Dictionary<string, System.Reflection.PropertyInfo> _propertyPathCache;
         /// <summary>
-        /// Caches factory functions for creating instances of types to optimize object instantiation performance.
+        /// Caches factory functions for creating instances of types to optimize object creation performance.
         /// </summary>
         private readonly Dictionary<Type, Func<object>> _factoryCache;
         /// <summary>
@@ -66,9 +66,14 @@ namespace TurboMapper.Impl
         public Mapper()
         {
             _configurations = new Dictionary<Type, Dictionary<Type, MapperConfiguration>>();
+            _propertyCache = new Dictionary<Type, System.Reflection.PropertyInfo[]>();
+            _propertyPathCache = new Dictionary<string, System.Reflection.PropertyInfo>();
+            _factoryCache = new Dictionary<Type, Func<object>>();
+            _getterCache = new Dictionary<string, Func<object, object>>();
+            _setterCache = new Dictionary<string, Action<object, object>>();
         }
         /// <summary>
-        /// Creates a mapping configuration between the specified source and target types, with optional custom property mappings.
+        /// Creates a mapping configuration between TSource and TTarget types with optional property mappings.
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TTarget"></typeparam>
@@ -84,7 +89,7 @@ namespace TurboMapper.Impl
             _configurations[sourceType][targetType] = new MapperConfiguration(mappings, true);
         }
         /// <summary>
-        /// Creates a mapping configuration between the specified source and target types, with specified custom property mappings and an option to enable or disable default name-based mapping for unmapped properties.
+        /// Creates a mapping configuration between TSource and TTarget types with specified property mappings and an option to enable default mapping for unmapped properties.
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TTarget"></typeparam>
@@ -101,7 +106,7 @@ namespace TurboMapper.Impl
             _configurations[sourceType][targetType] = new MapperConfiguration(mappings, enableDefaultMapping);
         }
         /// <summary>
-        /// Maps an instance of the source type to an instance of the target type, applying any configured property mappings, including support for nested properties, conditional mapping, and transformation functions.
+        /// Maps an instance of TSource to a new instance of TTarget, applying any configured property mappings, including support for nested properties, conditional mapping, and transformation functions.
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TTarget"></typeparam>
@@ -115,13 +120,11 @@ namespace TurboMapper.Impl
             var sourceType = typeof(TSource);
             var targetType = typeof(TTarget);
 
-            var target = Activator.CreateInstance<TTarget>();
+            var target = (TTarget)CreateInstance(targetType);
 
             // Check for custom mapping configuration
-            if (_configurations.ContainsKey(sourceType) &&
-                _configurations[sourceType].ContainsKey(targetType))
+            if (TryGetConfiguration(sourceType, targetType, out var config))
             {
-                var config = _configurations[sourceType][targetType];
                 if (config.EnableDefaultMapping)
                     ApplyCustomMappings(source, target, config.Mappings);
                 else
@@ -152,8 +155,9 @@ namespace TurboMapper.Impl
 
             return false;
         }
+
         /// <summary>
-        /// Applies custom property mappings from the source object to the target object, including support for nested properties, conditional mapping, and transformation functions. Also applies default name-based mapping for unmapped properties if enabled in the configuration.
+        /// Applies custom mappings with default mapping enabled. Ignores properties marked as ignored and applies conditions if specified.
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TTarget"></typeparam>
@@ -165,18 +169,33 @@ namespace TurboMapper.Impl
             TTarget target,
             List<PropertyMapping> mappings)
         {
-            // First, apply all custom mappings
+            // First, apply all non-ignored custom mappings that meet conditions
             foreach (var mapping in mappings)
             {
-                var sourceValue = GetNestedValue(source, mapping.SourcePropertyPath);
-                SetNestedValue(target, mapping.TargetPropertyPath, sourceValue);
+                if (!mapping.IsIgnored && (mapping.Condition == null || mapping.Condition(source)))
+                {
+                    var sourceValue = GetNestedValue(source, mapping.SourcePropertyPath);
+
+                    // Apply transformation if available
+                    if (mapping.TransformFunction != null && sourceValue != null)
+                    {
+                        // Use reflection to call the transformation function
+                        var transformFunc = (Delegate)mapping.TransformFunction;
+                        var transformedValue = transformFunc.DynamicInvoke(sourceValue);
+                        SetNestedValue(target, mapping.TargetPropertyPath, transformedValue);
+                    }
+                    else
+                    {
+                        SetNestedValue(target, mapping.TargetPropertyPath, sourceValue);
+                    }
+                }
             }
 
             // Then apply default name-based mapping for unmapped properties
             ApplyDefaultNameBasedMapping(source, target, mappings);
         }
         /// <summary>
-        /// Applies custom property mappings from the source object to the target object, including support for nested properties, conditional mapping, and transformation functions. Does not apply default name-based mapping for unmapped properties.
+        /// Applies only custom mappings with default mapping disabled. Ignores properties marked as ignored and applies conditions if specified.
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TTarget"></typeparam>
@@ -188,11 +207,26 @@ namespace TurboMapper.Impl
             TTarget target,
             List<PropertyMapping> mappings)
         {
-            // Apply only custom mappings, no default mappings
+            // Apply only non-ignored custom mappings that meet conditions, no default mappings
             foreach (var mapping in mappings)
             {
-                var sourceValue = GetNestedValue(source, mapping.SourcePropertyPath);
-                SetNestedValue(target, mapping.TargetPropertyPath, sourceValue);
+                if (!mapping.IsIgnored && (mapping.Condition == null || mapping.Condition(source)))
+                {
+                    var sourceValue = GetNestedValue(source, mapping.SourcePropertyPath);
+
+                    // Apply transformation if available
+                    if (mapping.TransformFunction != null && sourceValue != null)
+                    {
+                        // Use reflection to call the transformation function
+                        var transformFunc = (Delegate)mapping.TransformFunction;
+                        var transformedValue = transformFunc.DynamicInvoke(sourceValue);
+                        SetNestedValue(target, mapping.TargetPropertyPath, transformedValue);
+                    }
+                    else
+                    {
+                        SetNestedValue(target, mapping.TargetPropertyPath, sourceValue);
+                    }
+                }
             }
         }
         /// <summary>
@@ -207,7 +241,7 @@ namespace TurboMapper.Impl
             _converters[key] = converter;
         }
         /// <summary>
-        /// Applies default name-based mapping for properties that have not been explicitly mapped in custom mappings.
+        /// Applies default name-based mapping for properties not explicitly mapped, ignoring any properties that are marked as ignored in custom mappings.
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TTarget"></typeparam>
@@ -219,8 +253,8 @@ namespace TurboMapper.Impl
             TTarget target,
             List<PropertyMapping> customMappings)
         {
-            var sourceProps = typeof(TSource).GetProperties();
-            var targetProps = typeof(TTarget).GetProperties();
+            var sourceProps = GetTypeProperties(typeof(TSource));
+            var targetProps = GetTypeProperties(typeof(TTarget));
 
             foreach (var sourceProp in sourceProps)
             {
@@ -230,22 +264,25 @@ namespace TurboMapper.Impl
                     p.Name == sourceProp.Name &&
                     p.CanWrite);
 
-                if (targetProp != null)
+                if (targetProp != null && !IsTargetedInCustomMappings(targetProp.Name, customMappings))
                 {
-                    // Check if this target property is already targeted by any custom mapping
-                    var isTargeted = customMappings.Exists(m =>
-                        m.TargetPropertyPath.Split('.').Last() == targetProp.Name);
+                    ProcessPropertyMapping(source, target, sourceProp, targetProp);
+                }
+            }
+        }
         /// <summary>
-        /// Checks if a target property is already targeted in custom mappings (not ignored).
+        /// Checks if a target property is explicitly targeted in custom mappings (not ignored).
         /// </summary>
         /// <param name="targetPropertyName"></param>
         /// <param name="customMappings"></param>
         /// <returns></returns>
-                    if (!isTargeted)
-                    {
-                        var sourceValue = sourceProp.GetValue(source);
+        private bool IsTargetedInCustomMappings(string targetPropertyName, List<PropertyMapping> customMappings)
+        {
+            return customMappings.Exists(m =>
+                m.TargetPropertyPath.Split('.').Last() == targetPropertyName && !m.IsIgnored);
+        }
         /// <summary>
-        /// Checks if a target property is ignored in custom mappings.
+        /// Checks if a target property is marked as ignored in custom mappings.
         /// </summary>
         /// <param name="targetPropertyName"></param>
         /// <param name="customMappings"></param>
@@ -257,11 +294,11 @@ namespace TurboMapper.Impl
         }
 
         /// <summary>
-        /// Holds custom converters registered in the mapper.
+        /// Holds custom converters registered for specific source-target type pairs.
         /// </summary>
         private readonly Dictionary<string, Delegate> _converters = new Dictionary<string, Delegate>();
         /// <summary>
-        /// Validates the mapping configuration between the specified source and target types, ensuring that all specified source and target properties exist. Returns a ValidationResult indicating whether the configuration is valid and any errors found.
+        /// Creates an instance of the specified type using a cached factory function for performance.
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TTarget"></typeparam>
@@ -282,40 +319,29 @@ namespace TurboMapper.Impl
                         // Validate source property exists
                         if (!mapping.IsIgnored && !mapping.IsNested && !string.IsNullOrEmpty(mapping.SourcePropertyPath))
                         {
-                            // Handle nested object mapping
-                            if (sourceValue != null)
+                            if (!PropertyExists(sourceType, mapping.SourcePropertyPath))
                             {
-                                var nestedTargetValue = targetProp.GetValue(target);
-                                if (nestedTargetValue == null)
-                                {
-                                    nestedTargetValue = Activator.CreateInstance(targetProp.PropertyType);
-                                    targetProp.SetValue(target, nestedTargetValue);
-                                }
-
-                                var nestedSourceValue = sourceValue;
-                                // Use reflection to call the right generic method for nested mapping
-                                var genericMethod = typeof(Mapper).GetMethod(nameof(ApplyNameBasedMapping),
-                                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                                var specificMethod = genericMethod.MakeGenericMethod(sourceProp.PropertyType, targetProp.PropertyType);
-                                specificMethod.Invoke(this, new object[] { nestedSourceValue, nestedTargetValue });
-                            }
-                            else
-                            {
-                                targetProp.SetValue(target, null);
+                                errors.Add($"Source property '{mapping.SourcePropertyPath}' does not exist on type '{sourceType.Name}'");
                             }
                         }
-                        else
+
+                        // Validate target property exists
+                        if (!mapping.IsIgnored && !mapping.IsNested && !string.IsNullOrEmpty(mapping.TargetPropertyPath))
                         {
-                            // Handle simple types or type conversion
-                            var convertedValue = ConvertValue(sourceValue, targetProp.PropertyType);
-                            targetProp.SetValue(target, convertedValue);
+                            if (!PropertyExists(targetType, mapping.TargetPropertyPath))
+                            {
+                                errors.Add($"Target property '{mapping.TargetPropertyPath}' does not exist on type '{targetType.Name}'");
+                            }
                         }
                     }
                 }
             }
+
+            var isValid = errors.Count == 0;
+            return new ValidationResult(isValid, errors);
         }
         /// <summary>
-        /// Checks if a property (including nested properties) exists on the specified type.
+        /// Checks if a property exists on a type, supporting nested properties using dot notation.
         /// </summary>
         /// <param name="type"></param>
         /// <param name="propertyPath"></param>
@@ -366,7 +392,7 @@ namespace TurboMapper.Impl
             return false;
         }
         /// <summary>
-        /// Creates an instance of the specified type using a cached factory function for performance.
+        /// Gets or creates a factory function for the specified type to optimize object creation.
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TTarget"></typeparam>
@@ -374,8 +400,8 @@ namespace TurboMapper.Impl
         /// <param name="target"></param>
         internal void ApplyNameBasedMapping<TSource, TTarget>(TSource source, TTarget target)
         {
-            var sourceProps = typeof(TSource).GetProperties();
-            var targetProps = typeof(TTarget).GetProperties();
+            var sourceProps = GetTypeProperties(typeof(TSource));
+            var targetProps = GetTypeProperties(typeof(TTarget));
 
             foreach (var sourceProp in sourceProps)
             {
@@ -384,9 +410,12 @@ namespace TurboMapper.Impl
 
                 if (targetProp != null)
                 {
-                    var sourceValue = sourceProp.GetValue(source);
+                    ProcessPropertyMapping(source, target, sourceProp, targetProp);
+                }
+            }
+        }
         /// <summary>
-        /// Gets or creates a cached factory function for creating instances of the specified type.
+        /// Processes the mapping of a single property from source to target, handling both simple and complex types, including nested objects.
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TTarget"></typeparam>
@@ -394,40 +423,28 @@ namespace TurboMapper.Impl
         /// <param name="target"></param>
         /// <param name="sourceProp"></param>
         /// <param name="targetProp"></param>
-                    if (IsComplexType(sourceProp.PropertyType) && IsComplexType(targetProp.PropertyType))
-                    {
-                        // Handle nested object mapping
-                        if (sourceValue != null)
-                        {
-                            var nestedTargetValue = targetProp.GetValue(target);
-                            if (nestedTargetValue == null)
-                            {
-                                nestedTargetValue = Activator.CreateInstance(targetProp.PropertyType);
-                                targetProp.SetValue(target, nestedTargetValue);
-                            }
+        private void ProcessPropertyMapping<TSource, TTarget>(
+            TSource source,
+            TTarget target,
+            System.Reflection.PropertyInfo sourceProp,
+            System.Reflection.PropertyInfo targetProp)
+        {
+            var sourceGetter = GetOrCreateGetter(typeof(TSource), sourceProp.Name);
+            var targetSetter = GetOrCreateSetter(typeof(TTarget), targetProp.Name);
 
-                            // Recursively map the nested object properties using reflection
-                            var genericMethod = typeof(Mapper).GetMethod(nameof(ApplyNameBasedMapping),
-                                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                            var specificMethod = genericMethod.MakeGenericMethod(sourceProp.PropertyType, targetProp.PropertyType);
-                            specificMethod.Invoke(this, new object[] { sourceValue, nestedTargetValue });
-                        }
-                        else
-                        {
-                            targetProp.SetValue(target, null);
-                        }
-                    }
-                    else
-                    {
-                        // Handle simple types or type conversion
-                        var convertedValue = ConvertValue(sourceValue, targetProp.PropertyType);
-                        targetProp.SetValue(target, convertedValue);
-                    }
-                }
+            var sourceValue = sourceGetter?.Invoke(source);
+
+            if (IsComplexType(sourceProp.PropertyType) && IsComplexType(targetProp.PropertyType))
+            {
+                HandleComplexTypeMapping<TSource, TTarget>(sourceValue, target, targetProp, targetSetter);
+            }
+            else
+            {
+                HandleSimpleTypeMapping(sourceValue, target, targetProp, targetSetter);
             }
         }
         /// <summary>
-        /// Handles the mapping of complex type properties, including creating nested target objects as needed and recursively mapping their properties.
+        /// Handles the mapping of complex type properties, creating nested target objects as needed and recursively applying name-based mapping.
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TTarget"></typeparam>
@@ -456,7 +473,7 @@ namespace TurboMapper.Impl
             }
         }
         /// <summary>
-        /// Handles the mapping of simple type properties, including type conversion as needed.
+        /// Handles the mapping of simple type properties, applying type conversion as needed and gracefully handling conversion failures.
         /// </summary>
         /// <typeparam name="TTarget"></typeparam>
         /// <param name="sourceValue"></param>
@@ -481,7 +498,7 @@ namespace TurboMapper.Impl
             }
         }
         /// <summary>
-        /// Gets or creates a cached getter function for the specified property of the given type.
+        /// Get or create nested object for complex type properties, creating the instance if it does not already exist.
         /// </summary>
         /// <typeparam name="TTarget"></typeparam>
         /// <param name="target"></param>
@@ -503,7 +520,7 @@ namespace TurboMapper.Impl
             return nestedTargetValue;
         }
         /// <summary>
-        /// Creates an instance of the specified type using a cached factory function for performance.
+        /// Get nested property value using dot notation for property paths.
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="propertyPath"></param>
@@ -518,17 +535,19 @@ namespace TurboMapper.Impl
                 if (currentObject == null)
                     return null;
 
-                var propInfo = currentObject.GetType().GetProperty(property);
-                if (propInfo == null)
+                var type = currentObject.GetType();
+                var getter = GetOrCreateGetter(type, property);
+
+                if (getter == null)
                     return null;
 
-                currentObject = propInfo.GetValue(currentObject);
+                currentObject = getter(currentObject);
             }
 
             return currentObject;
         }
         /// <summary>
-        /// Sets a nested property value on the target object, creating intermediate objects as needed.
+        /// Set nested property value using dot notation for property paths, creating intermediate objects as needed.
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="propertyPath"></param>
@@ -540,29 +559,37 @@ namespace TurboMapper.Impl
 
             for (var i = 0; i < properties.Length - 1; i++)
             {
-                var propInfo = currentObject.GetType().GetProperty(properties[i]);
-                if (propInfo == null)
+                var type = currentObject.GetType();
+                var getter = GetOrCreateGetter(type, properties[i]);
+
+                if (getter == null)
                     return;
 
-                var nestedValue = propInfo.GetValue(currentObject);
+                var nestedValue = getter(currentObject);
                 if (nestedValue == null)
                 {
-                    nestedValue = Activator.CreateInstance(propInfo.PropertyType);
-                    propInfo.SetValue(currentObject, nestedValue);
+                    nestedValue = CreateInstance(type.GetProperty(properties[i]).PropertyType);
+                    var innerSetter = GetOrCreateSetter(type, properties[i]); // Renamed from 'setter' to 'innerSetter'
+                    if (innerSetter != null)
+                        innerSetter(currentObject, nestedValue);
                 }
 
                 currentObject = nestedValue;
             }
 
-            var lastPropInfo = currentObject.GetType().GetProperty(properties[properties.Length - 1]);
-            if (lastPropInfo != null)
+            var lastType = currentObject.GetType();
+            var lastPropertyName = properties[properties.Length - 1];
+            var setter = GetOrCreateSetter(lastType, lastPropertyName);
+
+            if (setter != null)
             {
+                var lastPropInfo = lastType.GetProperty(lastPropertyName);
                 var convertedValue = ConvertValue(value, lastPropInfo.PropertyType);
-                lastPropInfo.SetValue(currentObject, convertedValue);
+                setter(currentObject, convertedValue);
             }
         }
         /// <summary>
-        /// Gets or creates a cached getter function for the specified property of the given type.
+        /// Is Complex Type (i.e., class but not string, array, or collection)
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -579,7 +606,7 @@ namespace TurboMapper.Impl
             return true;
         }
         /// <summary>
-        /// Determines if the specified type is a nullable type (e.g., Nullable<T>).
+        /// Checks if the specified type is a nullable type (e.g., Nullable<int>).
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -588,7 +615,7 @@ namespace TurboMapper.Impl
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
         /// <summary>
-        /// Gets or creates a cached getter function for the specified property of the given type.
+        /// Convert value to the specified target type, handling nullable types, enums, and using custom converters if available.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="targetType"></param>
@@ -598,38 +625,155 @@ namespace TurboMapper.Impl
         {
             if (value == null)
                 return null;
+
+            // First, try custom converters
+            if (TryConvertWithCustomConverter(value, targetType, out var customResult))
+            {
+                return customResult;
+            }
+
+            // Handle nullable types
+            if (IsNullableType(targetType))
+            {
+                if (value == null)
+                    return null;
+
+                var underlyingType = Nullable.GetUnderlyingType(targetType);
+                var convertedValue = ConvertValue(value, underlyingType);
+                return convertedValue;
+            }
+
+            // If source is nullable and target is not, extract the value
+            if (IsNullableType(value.GetType()))
+            {
+                var underlyingType = Nullable.GetUnderlyingType(value.GetType());
+                if (underlyingType != null)
+                {
+                    var property = value.GetType().GetProperty("Value");
+                    if (property != null)
+                    {
+                        value = property.GetValue(value);
+                    }
+                }
+            }
+
             if (targetType.IsAssignableFrom(value.GetType()))
                 return value;
 
             if (targetType.IsEnum)
-                return Enum.Parse(targetType, value.ToString(), ignoreCase: true);
+            {
+                try
+                {
+                    return Enum.Parse(targetType, value.ToString(), ignoreCase: true);
+                }
+                catch (ArgumentException ex)  // This catches invalid enum values
+                {
+                    throw ex;
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"Failed to convert '{value}' to enum type '{targetType.Name}': {ex.Message}", ex);
+                }
+            }
 
             if (targetType == typeof(string))
-                return value.ToString();
+            {
+                return value?.ToString();
+            }
 
             if (targetType == typeof(Guid))
-                return Guid.Parse(value.ToString());
+            {
+                try
+                {
+                    return Guid.Parse(value.ToString());
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"Failed to convert '{value}' to Guid: {ex.Message}", ex);
+                }
+            }
 
             if (targetType.IsValueType)
             {
                 try
                 {
-                    if (targetType == typeof(int) && value is double doubleValue)
-                        return (int)doubleValue; // Explicit truncation for double to int
-                    else if (targetType == typeof(int) && value is float floatValue)
-                        return (int)floatValue; // Explicit truncation for float to int
+                    // Enhanced type conversion with more specific handling
+                    if (targetType == typeof(int))
+                    {
+                        if (value is double doubleValue)
+                            return (int)doubleValue; // Explicit truncation for double to int
+                        else if (value is float floatValue)
+                            return (int)floatValue; // Explicit truncation for float to int
+                        else if (value is decimal decimalValue)
+                            return (int)decimalValue;
+                        else
+                            return Convert.ToInt32(value);
+                    }
+                    else if (targetType == typeof(long))
+                    {
+                        return Convert.ToInt64(value);
+                    }
+                    else if (targetType == typeof(float))
+                    {
+                        if (value is double doubleValue)
+                            return (float)doubleValue;
+                        else if (value is decimal decimalValue)
+                            return (float)decimalValue;
+                        else
+                            return Convert.ToSingle(value);
+                    }
+                    else if (targetType == typeof(double))
+                    {
+                        if (value is float floatValue)
+                            return (double)floatValue;
+                        else if (value is decimal decimalValue)
+                            return (double)decimalValue;
+                        else
+                            return Convert.ToDouble(value);
+                    }
+                    else if (targetType == typeof(decimal))
+                    {
+                        if (value is double doubleValue)
+                            return (decimal)doubleValue;
+                        else if (value is float floatValue)
+                            return (decimal)floatValue;
+                        else
+                            return Convert.ToDecimal(value);
+                    }
+                    else if (targetType == typeof(DateTime))
+                    {
+                        if (value is string stringValue)
+                            return DateTime.Parse(stringValue);
+                        else if (value is long longValue) // Assuming timestamp
+                            return DateTime.FromBinary(longValue);
+                        else
+                            return (DateTime)Convert.ChangeType(value, targetType);
+                    }
+                    else if (targetType == typeof(TimeSpan))
+                    {
+                        if (value is string stringValue)
+                            return TimeSpan.Parse(stringValue);
+                        else if (value is long ticksValue)
+                            return TimeSpan.FromTicks(ticksValue);
+                        else
+                            return (TimeSpan)Convert.ChangeType(value, targetType);
+                    }
                     else
+                    {
                         return Convert.ChangeType(value, targetType);
+                    }
                 }
-                catch (FormatException)
+                catch (FormatException ex)
                 {
-                    // If conversion fails, return default value for the target type
-                    return Activator.CreateInstance(targetType);
+                    throw new InvalidOperationException($"Failed to convert '{value}' (type: {value.GetType().Name}) to '{targetType.Name}': Format exception - {ex.Message}", ex);
                 }
-                catch (InvalidCastException)
+                catch (InvalidCastException ex)
                 {
-                    // If conversion fails, return default value for the target type
-                    return Activator.CreateInstance(targetType);
+                    throw new InvalidOperationException($"Failed to convert '{value}' (type: {value.GetType().Name}) to '{targetType.Name}': Invalid cast - {ex.Message}", ex);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"Failed to convert '{value}' (type: {value.GetType().Name}) to '{targetType.Name}': {ex.Message}", ex);
                 }
             }
 
@@ -650,10 +794,9 @@ namespace TurboMapper.Impl
                         return specificMapMethod.Invoke(this, new object[] { value });
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // If mapping fails, return the original value
-                    return value;
+                    throw new InvalidOperationException($"Failed to map complex type '{value.GetType().Name}' to '{targetType.Name}': {ex.Message}", ex);
                 }
             }
 
@@ -682,7 +825,7 @@ namespace TurboMapper.Impl
             return specificMapMethod.Invoke(this, new object[] { source });
         }
         /// <summary>
-        /// Gets the properties of the specified type, using a cache for performance.
+        /// Gets the properties of a type, using a cache to optimize repeated access.
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -698,7 +841,7 @@ namespace TurboMapper.Impl
             return properties;
         }
         /// <summary>
-        /// Gets or creates a cached factory function for creating instances of the specified type.
+        /// Gets or creates a factory function for the specified type to optimize object creation.
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -737,7 +880,7 @@ namespace TurboMapper.Impl
             return factory();
         }
         /// <summary>
-        /// Gets or creates a cached getter function for the specified property of the given type.
+        /// Gets or creates a getter function for the specified property of the given type, using a cache to optimize repeated access.
         /// </summary>
         /// <param name="objType"></param>
         /// <param name="propertyName"></param>
@@ -769,7 +912,7 @@ namespace TurboMapper.Impl
             return getter;
         }
         /// <summary>
-        /// Gets or creates a cached setter function for the specified property of the given type.
+        /// Gets or creates a setter function for the specified property of the given type, using a cache to optimize repeated access.
         /// </summary>
         /// <param name="objType"></param>
         /// <param name="propertyName"></param>

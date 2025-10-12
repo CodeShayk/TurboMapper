@@ -16,7 +16,7 @@ namespace TurboMapper
         internal readonly System.Collections.Generic.List<PropertyMapping> Mappings = new System.Collections.Generic.List<PropertyMapping>();
 
         /// <summary>
-        /// Configures a mapping for a specific member from the source type to the target type.
+        /// Configures a mapping for a specific member in the target type, specifying the corresponding member in the source type.
         /// </summary>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="targetMember"></param>
@@ -26,8 +26,8 @@ namespace TurboMapper
             Expression<Func<TTarget, TValue>> targetMember,
             Expression<Func<TSource, TValue>> sourceMember)
         {
-            var targetPath = GetMemberPath<TValue>(targetMember);
-            var sourcePath = GetMemberPath(sourceMember);
+            var targetPath = GetMemberPathForTarget(targetMember);
+            var sourcePath = GetMemberPathForSource(sourceMember);
 
             Mappings.Add(new PropertyMapping
             {
@@ -40,38 +40,33 @@ namespace TurboMapper
             return this;
         }
         /// <summary>
-        /// Extracts the member path from a lambda expression.
+        /// Extracts the member path from a given expression for the target type, supporting nested properties.
         /// </summary>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="expression"></param>
         /// <returns></returns>
-        private string GetMemberPath<TValue>(Expression<Func<TTarget, TValue>> expression)
+        private string GetMemberPathForTarget<TValue>(Expression<Func<TTarget, TValue>> expression)
         {
-            var path = new System.Collections.Generic.List<string>();
-            var memberExpression = expression.Body as MemberExpression;
-        /// <summary>
-        /// Extracts the member path from a lambda expression.
-        /// </summary>
-        /// <typeparam name="TValue"></typeparam>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-            while (memberExpression != null)
-            {
-                path.Add(memberExpression.Member.Name);
-                memberExpression = memberExpression.Expression as MemberExpression;
-            }
-
-            path.Reverse();
-            return string.Join(".", path);
+            return GetMemberPathInternal(expression);
         }
         /// <summary>
-        /// Extracts the member path from a lambda expression.
+        /// Extracts the member path from a given expression for the source type, supporting nested properties.
+        /// </summary>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        private string GetMemberPathForSource<TValue>(Expression<Func<TSource, TValue>> expression)
+        {
+            return GetMemberPathInternal(expression);
+        }
+        /// <summary>
+        /// Extracts the member path from a given expression, supporting nested properties.
         /// </summary>
         /// <typeparam name="TExpressionValue"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="expression"></param>
         /// <returns></returns>
-        private string GetMemberPath<TSourceValue, TValue>(Expression<Func<TSourceValue, TValue>> expression)
+        private static string GetMemberPathInternal<TExpressionValue, TValue>(Expression<Func<TExpressionValue, TValue>> expression)
         {
             var path = new System.Collections.Generic.List<string>();
             var memberExpression = expression.Body as MemberExpression;
