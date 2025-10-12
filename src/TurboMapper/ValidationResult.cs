@@ -11,10 +11,12 @@ namespace TurboMapper
         /// Indicates whether the validation was successful.
         /// </summary>
         public bool IsValid { get; set; }
+
         /// <summary>
         /// A collection of error messages associated with the validation.
         /// </summary>
         public IEnumerable<string> Errors { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the ValidationResult class with default values.
         /// </summary>
@@ -22,6 +24,7 @@ namespace TurboMapper
         {
             Errors = new List<string>();
         }
+
         /// <summary>
         /// Initializes a new instance of the ValidationResult class with specified validity and error messages.
         /// </summary>

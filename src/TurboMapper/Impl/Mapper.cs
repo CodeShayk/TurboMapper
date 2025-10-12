@@ -16,10 +16,12 @@ namespace TurboMapper.Impl
         /// A list of custom property mappings defined for this configuration.
         /// </summary>
         public List<PropertyMapping> Mappings { get; set; }
+
         /// <summary>
         /// Indicates whether default name-based mapping is enabled for properties not explicitly mapped.
         /// </summary>
         public bool EnableDefaultMapping { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the MapperConfiguration class with specified property mappings and default mapping setting.
         /// </summary>
@@ -31,6 +33,7 @@ namespace TurboMapper.Impl
             EnableDefaultMapping = enableDefaultMapping;
         }
     }
+
     /// <summary>
     /// Implements the object mapping functionality, allowing for configuration of mappings between source and target types, including support for custom property mappings, nested properties, conditional mapping, and transformation functions.
     /// </summary>
@@ -40,26 +43,32 @@ namespace TurboMapper.Impl
         /// Holds mapping configurations indexed by source type and target type.
         /// </summary>
         private readonly Dictionary<Type, Dictionary<Type, MapperConfiguration>> _configurations;
+
         /// <summary>
         /// Caches property info arrays for types to optimize reflection performance.
         /// </summary>
         private readonly Dictionary<Type, System.Reflection.PropertyInfo[]> _propertyCache;
+
         /// <summary>
         /// Caches property info for nested property paths to optimize reflection performance.
         /// </summary>
         private readonly Dictionary<string, System.Reflection.PropertyInfo> _propertyPathCache;
+
         /// <summary>
         /// Caches factory functions for creating instances of types to optimize object creation performance.
         /// </summary>
         private readonly Dictionary<Type, Func<object>> _factoryCache;
+
         /// <summary>
         /// Caches getter functions for properties to optimize property access performance.
         /// </summary>
         private readonly Dictionary<string, Func<object, object>> _getterCache;
+
         /// <summary>
         /// Caches setter functions for properties to optimize property assignment performance.
         /// </summary>
         private readonly Dictionary<string, Action<object, object>> _setterCache;
+
         /// <summary>
         /// Initializes a new instance of the Mapper class.
         /// </summary>
@@ -72,6 +81,7 @@ namespace TurboMapper.Impl
             _getterCache = new Dictionary<string, Func<object, object>>();
             _setterCache = new Dictionary<string, Action<object, object>>();
         }
+
         /// <summary>
         /// Creates a mapping configuration between TSource and TTarget types with optional property mappings.
         /// </summary>
@@ -88,6 +98,7 @@ namespace TurboMapper.Impl
 
             _configurations[sourceType][targetType] = new MapperConfiguration(mappings, true);
         }
+
         /// <summary>
         /// Creates a mapping configuration between TSource and TTarget types with specified property mappings and an option to enable default mapping for unmapped properties.
         /// </summary>
@@ -105,6 +116,7 @@ namespace TurboMapper.Impl
 
             _configurations[sourceType][targetType] = new MapperConfiguration(mappings, enableDefaultMapping);
         }
+
         /// <summary>
         /// Maps an instance of TSource to a new instance of TTarget, applying any configured property mappings, including support for nested properties, conditional mapping, and transformation functions.
         /// </summary>
@@ -136,6 +148,7 @@ namespace TurboMapper.Impl
 
             return target;
         }
+
         /// <summary>
         /// Tries to retrieve the mapping configuration for the specified source and target types.
         /// </summary>
@@ -194,6 +207,7 @@ namespace TurboMapper.Impl
             // Then apply default name-based mapping for unmapped properties
             ApplyDefaultNameBasedMapping(source, target, mappings);
         }
+
         /// <summary>
         /// Applies only custom mappings with default mapping disabled. Ignores properties marked as ignored and applies conditions if specified.
         /// </summary>
@@ -229,6 +243,7 @@ namespace TurboMapper.Impl
                 }
             }
         }
+
         /// <summary>
         /// Registers a custom converter function to convert from TSource to TDestination types.
         /// </summary>
@@ -240,6 +255,7 @@ namespace TurboMapper.Impl
             var key = $"{typeof(TSource).FullName}_{typeof(TDestination).FullName}";
             _converters[key] = converter;
         }
+
         /// <summary>
         /// Applies default name-based mapping for properties not explicitly mapped, ignoring any properties that are marked as ignored in custom mappings.
         /// </summary>
@@ -270,6 +286,7 @@ namespace TurboMapper.Impl
                 }
             }
         }
+
         /// <summary>
         /// Checks if a target property is explicitly targeted in custom mappings (not ignored).
         /// </summary>
@@ -281,6 +298,7 @@ namespace TurboMapper.Impl
             return customMappings.Exists(m =>
                 m.TargetPropertyPath.Split('.').Last() == targetPropertyName && !m.IsIgnored);
         }
+
         /// <summary>
         /// Checks if a target property is marked as ignored in custom mappings.
         /// </summary>
@@ -297,6 +315,7 @@ namespace TurboMapper.Impl
         /// Holds custom converters registered for specific source-target type pairs.
         /// </summary>
         private readonly Dictionary<string, Delegate> _converters = new Dictionary<string, Delegate>();
+
         /// <summary>
         /// Creates an instance of the specified type using a cached factory function for performance.
         /// </summary>
@@ -340,6 +359,7 @@ namespace TurboMapper.Impl
             var isValid = errors.Count == 0;
             return new ValidationResult(isValid, errors);
         }
+
         /// <summary>
         /// Checks if a property exists on a type, supporting nested properties using dot notation.
         /// </summary>
@@ -362,6 +382,7 @@ namespace TurboMapper.Impl
 
             return true;
         }
+
         /// <summary>
         /// Creates an instance of the specified type using a cached factory function for performance.
         /// </summary>
@@ -391,6 +412,7 @@ namespace TurboMapper.Impl
 
             return false;
         }
+
         /// <summary>
         /// Gets or creates a factory function for the specified type to optimize object creation.
         /// </summary>
@@ -414,6 +436,7 @@ namespace TurboMapper.Impl
                 }
             }
         }
+
         /// <summary>
         /// Processes the mapping of a single property from source to target, handling both simple and complex types, including nested objects.
         /// </summary>
@@ -443,6 +466,7 @@ namespace TurboMapper.Impl
                 HandleSimpleTypeMapping(sourceValue, target, targetProp, targetSetter);
             }
         }
+
         /// <summary>
         /// Handles the mapping of complex type properties, creating nested target objects as needed and recursively applying name-based mapping.
         /// </summary>
@@ -472,6 +496,7 @@ namespace TurboMapper.Impl
                 targetSetter?.Invoke(target, null);
             }
         }
+
         /// <summary>
         /// Handles the mapping of simple type properties, applying type conversion as needed and gracefully handling conversion failures.
         /// </summary>
@@ -497,6 +522,7 @@ namespace TurboMapper.Impl
                 // This allows for graceful handling of incompatible types
             }
         }
+
         /// <summary>
         /// Get or create nested object for complex type properties, creating the instance if it does not already exist.
         /// </summary>
@@ -519,6 +545,7 @@ namespace TurboMapper.Impl
             }
             return nestedTargetValue;
         }
+
         /// <summary>
         /// Get nested property value using dot notation for property paths.
         /// </summary>
@@ -546,6 +573,7 @@ namespace TurboMapper.Impl
 
             return currentObject;
         }
+
         /// <summary>
         /// Set nested property value using dot notation for property paths, creating intermediate objects as needed.
         /// </summary>
@@ -588,6 +616,7 @@ namespace TurboMapper.Impl
                 setter(currentObject, convertedValue);
             }
         }
+
         /// <summary>
         /// Is Complex Type (i.e., class but not string, array, or collection)
         /// </summary>
@@ -605,6 +634,7 @@ namespace TurboMapper.Impl
                 return false;
             return true;
         }
+
         /// <summary>
         /// Checks if the specified type is a nullable type (e.g., Nullable<int>).
         /// </summary>
@@ -614,6 +644,7 @@ namespace TurboMapper.Impl
         {
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
         }
+
         /// <summary>
         /// Convert value to the specified target type, handling nullable types, enums, and using custom converters if available.
         /// </summary>
@@ -802,6 +833,7 @@ namespace TurboMapper.Impl
 
             return value;
         }
+
         /// <summary>
         /// Maps an object of unknown type to the specified target type using reflection to invoke the generic Map method.
         /// </summary>
@@ -824,6 +856,7 @@ namespace TurboMapper.Impl
             var specificMapMethod = genericMapMethod.MakeGenericMethod(sourceType, targetType);
             return specificMapMethod.Invoke(this, new object[] { source });
         }
+
         /// <summary>
         /// Gets the properties of a type, using a cache to optimize repeated access.
         /// </summary>
@@ -840,6 +873,7 @@ namespace TurboMapper.Impl
             _propertyCache[type] = properties;
             return properties;
         }
+
         /// <summary>
         /// Gets or creates a factory function for the specified type to optimize object creation.
         /// </summary>
@@ -869,6 +903,7 @@ namespace TurboMapper.Impl
             _factoryCache[type] = factory;
             return factory;
         }
+
         /// <summary>
         /// Creates an instance of the specified type using a cached factory function for performance.
         /// </summary>
@@ -879,6 +914,7 @@ namespace TurboMapper.Impl
             var factory = GetOrCreateFactory(type);
             return factory();
         }
+
         /// <summary>
         /// Gets or creates a getter function for the specified property of the given type, using a cache to optimize repeated access.
         /// </summary>
@@ -911,6 +947,7 @@ namespace TurboMapper.Impl
             _getterCache[cacheKey] = getter;
             return getter;
         }
+
         /// <summary>
         /// Gets or creates a setter function for the specified property of the given type, using a cache to optimize repeated access.
         /// </summary>
@@ -946,6 +983,7 @@ namespace TurboMapper.Impl
             _setterCache[cacheKey] = setter;
             return setter;
         }
+
         /// <summary>
         /// Maps a source object of type TSource to a new instance of type TDestination using the configured mappings.
         /// </summary>

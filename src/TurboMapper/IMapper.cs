@@ -15,6 +15,7 @@ namespace TurboMapper
         /// <param name="source"></param>
         /// <returns></returns>
         TTarget Map<TSource, TTarget>(TSource source);
+
         /// <summary>
         /// Maps a collection of objects of type TSource to a collection of objects of type TDestination.
         /// </summary>
@@ -23,6 +24,7 @@ namespace TurboMapper
         /// <param name="source"></param>
         /// <returns></returns>
         IEnumerable<TDestination> Map<TSource, TDestination>(IEnumerable<TSource> source);
+
         /// <summary>
         /// Validates the mapping configuration between TSource and TTarget types.
         /// </summary>

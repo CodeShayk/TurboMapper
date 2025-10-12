@@ -37,6 +37,7 @@ namespace TurboMapper
 
             return services;
         }
+
         /// <summary>
         /// Discovers and registers mapping modules from loaded assemblies.
         /// </summary>
@@ -131,6 +132,7 @@ namespace TurboMapper
                 }
             }
         }
+
         /// <summary>
         /// Gets all non-abstract classes implementing IMappingModule from the specified assembly.
         /// </summary>

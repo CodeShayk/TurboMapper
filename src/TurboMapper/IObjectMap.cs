@@ -15,6 +15,7 @@ namespace TurboMapper
         /// <typeparam name="TTarget"></typeparam>
         /// <param name="mappings"></param>
         void CreateMap<TSource, TTarget>(List<PropertyMapping> mappings = null);
+
         /// <summary>
         /// Creates a mapping configuration between TSource and TTarget types with specified property mappings and an option to enable default mapping for unmapped properties.
         /// </summary>
@@ -23,6 +24,7 @@ namespace TurboMapper
         /// <param name="mappings"></param>
         /// <param name="enableDefaultMapping"></param>
         void CreateMap<TSource, TTarget>(List<PropertyMapping> mappings, bool enableDefaultMapping);
+
         /// <summary>
         /// Registers a custom converter function to convert from TSource to TDestination types.
         /// </summary>

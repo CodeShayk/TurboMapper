@@ -12,13 +12,15 @@ namespace TurboMapper
     public abstract class MappingModule<TSource, TTarget> : IMappingModule
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private readonly Action<MappingExpression<TSource, TTarget>> _configAction;
+
         /// <summary>
         /// Indicates whether default property mappings should be enabled for unmapped properties.
         /// </summary>
         private readonly bool _enableDefaultMapping;
+
         /// <summary>
         /// Holds custom converters registered within this module.
         /// </summary>
@@ -34,6 +36,7 @@ namespace TurboMapper
             _enableDefaultMapping = enableDefaultMapping;
             _converters = new Dictionary<string, Delegate>();
         }
+
         /// <summary>
         /// Creates the mapping configuration between TSource and TTarget types.
         /// </summary>
@@ -76,6 +79,7 @@ namespace TurboMapper
 
             mapper.CreateMap<TSource, TTarget>(expression.Mappings, _enableDefaultMapping);
         }
+
         /// <summary>
         /// When implemented in a derived class, this method should return an action that configures the property mappings between TSource and TTarget types.
         /// </summary>
@@ -93,6 +97,7 @@ namespace TurboMapper
             var key = $"{typeof(TSourceConverter).FullName}_{typeof(TDestination).FullName}";
             _converters[key] = converter;
         }
+
         /// <summary>
         /// Registers all custom converters defined in this module with the provided IObjectMap instance.
         /// </summary>

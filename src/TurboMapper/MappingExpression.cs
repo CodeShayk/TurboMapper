@@ -39,6 +39,7 @@ namespace TurboMapper
 
             return this;
         }
+
         /// <summary>
         /// Extracts the member path from a given expression for the target type, supporting nested properties.
         /// </summary>
@@ -49,6 +50,7 @@ namespace TurboMapper
         {
             return GetMemberPathInternal(expression);
         }
+
         /// <summary>
         /// Extracts the member path from a given expression for the source type, supporting nested properties.
         /// </summary>
@@ -59,6 +61,7 @@ namespace TurboMapper
         {
             return GetMemberPathInternal(expression);
         }
+
         /// <summary>
         /// Extracts the member path from a given expression, supporting nested properties.
         /// </summary>
@@ -86,6 +89,7 @@ namespace TurboMapper
             var parts = path.Split('.');
             return parts[parts.Length - 1];
         }
+
         /// <summary>
         /// Ignores a specific member in the target type during the mapping process.
         /// </summary>
@@ -107,6 +111,7 @@ namespace TurboMapper
 
             return this;
         }
+
         /// <summary>
         /// Applies a condition to a specific member in the target type, determining whether it should be mapped based on the provided condition function.
         /// </summary>
@@ -129,6 +134,7 @@ namespace TurboMapper
 
             return this;
         }
+
         /// <summary>
         /// Maps a target member using a custom transformation function that takes a source value and produces a target value.
         /// </summary>

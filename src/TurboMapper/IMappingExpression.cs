@@ -18,6 +18,7 @@ namespace TurboMapper
         /// <param name="sourceMember"></param>
         /// <returns></returns>
         IMappingExpression<TSource, TTarget> ForMember<TValue>(Expression<Func<TTarget, TValue>> targetMember, Expression<Func<TSource, TValue>> sourceMember);
+
         /// <summary>
         /// Ignores a specific member in the target type during the mapping process.
         /// </summary>
@@ -25,6 +26,7 @@ namespace TurboMapper
         /// <param name="targetMember"></param>
         /// <returns></returns>
         IMappingExpression<TSource, TTarget> Ignore<TValue>(Expression<Func<TTarget, TValue>> targetMember);
+
         /// <summary>
         /// Applies a condition to a specific member in the target type, determining whether it should be mapped based on the provided condition function.
         /// </summary>
@@ -33,6 +35,7 @@ namespace TurboMapper
         /// <param name="condition"></param>
         /// <returns></returns>
         IMappingExpression<TSource, TTarget> When<TValue>(Expression<Func<TTarget, TValue>> targetMember, Func<TSource, bool> condition);
+
         /// <summary>
         /// Maps a target member using a custom transformation function that takes a source value and produces a target value.
         /// </summary>
