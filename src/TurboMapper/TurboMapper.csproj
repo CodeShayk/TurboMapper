@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462;netstandard2.0;netstandard2.1;net9.0</TargetFrameworks>
+    <TargetFrameworks>net462;netstandard2.0;netstandard2.1;net9.0;net10.0</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
     <Title>TurboMapper</Title>
     <Authors>CodeShayk</Authors>
@@ -9,10 +9,10 @@
     <Description>
       `TurboMapper` is a lightweight, high-performance object mapper for .NET that provides both shallow and deep mapping capabilities. It serves as a free alternative to AutoMapper with a simple, intuitive API.
     </Description>
-    <PackageIcon>ninja-icon-16.png</PackageIcon>
+    <PackageIcon>turbo-icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Copyright>Copyright (c) 2025 Code Shayk</Copyright>
+    <Copyright>Copyright (c) 2026 Code Shayk</Copyright>
     <RepositoryType>git</RepositoryType>
     <PackageTags>object-mapper, deep-mapper, mapping-library, automapper, turbomapper, objectmapper, mapper, mappings, mapper-library</PackageTags>
     <IncludeSymbols>True</IncludeSymbols>
@@ -21,14 +21,19 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PackageProjectUrl>https://github.com/CodeShayk/TurboMapper/wiki</PackageProjectUrl>
     <RepositoryUrl>https://github.com/CodeShayk/TurboMapper</RepositoryUrl>
-    <PackageReleaseNotes>v1.2.0 - Enhanced core and mapping features including performance improvements (2x+ speed), collection mapping support, custom type converters, conditional mapping, transformation functions, and configuration validation</PackageReleaseNotes>
-    <Version>1.2.0</Version>
+    <PackageReleaseNotes>
+      # TurboMapper 1.5.0 - No Functional Changes.
+      ## Release Type: Minor Release:  Targets .Net 10
+      **Date**: 2026-03-13
+      **Version**: 1.5.0
+    </PackageReleaseNotes>
+    <Version>1.5.0</Version>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <AssemblyName>TurboMapper</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\Images\ninja-icon-16.png">
+    <None Include="..\..\Images\turbo-icon.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

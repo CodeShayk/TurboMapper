@@ -1,8 +1,9 @@
-# <img src="https://github.com/CodeShayk/TurboMapper/blob/master/Images/ninja-icon-16.png" alt="ninja" style="width:30px;"/> TurboMapper v1.2.0
+# <img src="https://github.com/CodeShayk/TurboMapper/blob/master/Images/turbo-icon.png" alt="turbo" style="width:30px;"/> TurboMapper v1.5.0
 [![NuGet version](https://badge.fury.io/nu/TurboMapper.svg)](https://badge.fury.io/nu/TurboMapper) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/CodeShayk/TurboMapper/blob/master/LICENSE.md) 
 [![GitHub Release](https://img.shields.io/github/v/release/CodeShayk/TurboMapper?logo=github&sort=semver)](https://github.com/CodeShayk/TurboMapper/releases/latest)
 [![master-build](https://github.com/CodeShayk/TurboMapper/actions/workflows/Master-Build.yml/badge.svg)](https://github.com/CodeShayk/TurboMapper/actions/workflows/Master-Build.yml)
 [![master-codeql](https://github.com/CodeShayk/TurboMapper/actions/workflows/Master-CodeQL.yml/badge.svg)](https://github.com/CodeShayk/TurboMapper/actions/workflows/Master-CodeQL.yml)
+[![.Net 10.0](https://img.shields.io/badge/.Net-10.0-green)](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
 [![.Net 9.0](https://img.shields.io/badge/.Net-9.0-blue)](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
 [![.Net Framework 4.6.4](https://img.shields.io/badge/.Net-4.6.2-blue)](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net46)
 [![.Net Standard 2.0](https://img.shields.io/badge/.NetStandard-2.0-blue)](https://github.com/dotnet/standard/blob/v2.0.0/docs/versions/netstandard2.0.md)
@@ -68,6 +69,7 @@ This section provides the summary of planned releases with key details about eac
 
 | Release Version | Release Date | Key Features | Backward Compatibility | Primary Focus |
 |----------------|--------------|--------------|----------------------|---------------|
+| 1.5.0 | March 2026 | Targets .Net 10.0 | ✅ Fully backward compatible | No Functional Changes |
 | 1.2.0 | October 2025 | Performance improvements (2x+ speed), enhanced collection mapping API, custom type converters, conditional mapping, transformation functions, configuration validation, improved error messages | ✅ Fully backward compatible | Core improvements, mapping features, custom conversions |
 | 1.4.0 | Jan 2026 | Complex nested mapping, circular reference handling, performance diagnostics, generic collection interfaces, interface-to-concrete mapping, dictionary mapping, .NET Standard compatibility | ✅ Fully backward compatible | Advanced mapping, type features, enhanced conversions |
 | 2.1.0 | Mid 2026 | Pre-compiled mappings, reverse mapping, async transformations, async collection processing, LINQ expressions, projection support, detailed tracing | ❌ Contains breaking changes (new async methods in IMapper) | Next-gen features, async operations, data access integration |
