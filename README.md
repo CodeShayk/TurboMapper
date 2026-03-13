@@ -1,4 +1,4 @@
-# <img src="https://github.com/CodeShayk/TurboMapper/blob/master/Images/ninja-icon-16.png" alt="ninja" style="width:30px;"/> TurboMapper v1.2.0
+# <img src="https://github.com/CodeShayk/TurboMapper/blob/master/Images/turbo-icon.png" alt="ninja" style="width:50px;"/> TurboMapper v1.2.0
 [![NuGet version](https://badge.fury.io/nu/TurboMapper.svg)](https://badge.fury.io/nu/TurboMapper) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/CodeShayk/TurboMapper/blob/master/LICENSE.md) 
 [![GitHub Release](https://img.shields.io/github/v/release/CodeShayk/TurboMapper?logo=github&sort=semver)](https://github.com/CodeShayk/TurboMapper/releases/latest)
 [![master-build](https://github.com/CodeShayk/TurboMapper/actions/workflows/Master-Build.yml/badge.svg)](https://github.com/CodeShayk/TurboMapper/actions/workflows/Master-Build.yml)
